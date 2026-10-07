@@ -28,7 +28,7 @@
       <div>
         <span class="pill">SARFRUT S.A. DE C.V.</span>
         <h2>Gracias por compartir tu experiencia</h2>
-        <p>Al finalizar se generará un PDF con tus respuestas, un resumen ejecutivo y un análisis descriptivo para Recursos Humanos.</p>
+        <p>Al finalizar, tus respuestas se convertirán en un PDF confidencial con resumen y análisis, y se enviarán directamente a Recursos Humanos.</p>
       </div>
       <div class="progress-panel" aria-label="Progreso del formulario">
         <div class="progress-top"><span>Avance</span><strong id="progressText">0%</strong></div>
@@ -38,7 +38,7 @@
 
     <div class="privacy-notice">
       <strong>Privacidad por diseño:</strong>
-      <span id="privacyModeText">esta versión genera el PDF en el navegador y no guarda una copia en Vercel ni en una base de datos.</span>
+      <span id="privacyModeText">no se utiliza una base de datos. El documento se genera únicamente para enviarse al correo configurado de Recursos Humanos; el colaborador no recibe una copia desde este sitio.</span>
     </div>
 
     <form id="exitForm" novalidate>
@@ -115,8 +115,8 @@
         </div>
         <label class="consent"><input type="checkbox" name="confirmacion" required /><span>Confirmo que la información registrada corresponde a mi entrevista de salida y puede ser utilizada por Recursos Humanos para fines internos de análisis y mejora.</span></label>
         <div class="submit-row">
-          <div><strong>Antes de generar el documento</strong><p>Revisa que tus respuestas estén completas. Al finalizar se descargará un PDF automáticamente.</p></div>
-          <button class="primary-button" type="submit" id="submitBtn"><span>Generar PDF</span><span aria-hidden="true">→</span></button>
+          <div><strong>Antes de enviar</strong><p>Revisa que tus respuestas estén completas. Al finalizar, el documento será enviado de forma confidencial a Recursos Humanos.</p></div>
+          <button class="primary-button" type="submit" id="submitBtn"><span>Enviar entrevista</span><span aria-hidden="true">→</span></button>
         </div>
         <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
       </section>
@@ -126,21 +126,19 @@
   <footer><div class="shell"><span>Recursos Humanos · Documento de uso interno</span><span>La información será tratada de forma confidencial.</span></div></footer>
 
   <div id="successModal" class="modal" hidden>
-    <div class="modal-card modal-card-wide" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="successTitle">
       <div class="success-icon">✓</div>
-      <h2 id="successTitle">PDF generado correctamente</h2>
-      <p id="successText">El documento se descargó en este dispositivo.</p>
-      <div id="analysisPreview" class="analysis-preview"></div>
+      <h2 id="successTitle">Entrevista enviada</h2>
+      <p id="successText">Gracias. Recursos Humanos recibió tu entrevista de salida. Este sitio no conservará una copia en una base de datos ni descargará el PDF en tu dispositivo.</p>
       <div class="modal-actions">
-        <button class="ghost-button" type="button" id="downloadAgain">Descargar PDF otra vez</button>
-        <button class="primary-button" type="button" id="closeSuccess">Nueva entrevista</button>
+        <button class="primary-button" type="button" id="closeSuccess">Finalizar</button>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
-  <script src="/config.js"></script>
+  <script src="/logo-data.js"></script>
   <script src="/form.js" defer></script>
 </body>
 </html>

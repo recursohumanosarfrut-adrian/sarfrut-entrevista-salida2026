@@ -1,76 +1,58 @@
-# SARFRUT · Entrevista de salida V4
+# SARFRUT · Entrevista de salida V5
 
-Versión sin Supabase ni base de datos obligatoria.
+Versión sin Supabase y sin base de datos de respuestas.
 
-## Qué hace
+## Flujo
 
-- Formulario corporativo de entrevista de salida.
-- Al finalizar genera y descarga automáticamente un **PDF A4** con:
-  - datos generales;
-  - motivos de salida;
-  - evaluación de los 7 aspectos;
-  - comentarios finales;
-  - promedio global;
-  - resumen ejecutivo;
-  - análisis descriptivo automático;
-  - fortalezas, áreas de atención y acciones sugeridas;
-  - espacios de firma.
-- El PDF se genera **en el navegador**: Vercel no recibe ni guarda la entrevista.
-- No requiere variables de entorno.
-- No requiere Supabase.
+`Colaborador → formulario → PDF en memoria → función de Vercel → Google Apps Script → correo de RH`
 
-## Dos modos de uso
+El colaborador **no descarga ni recibe el PDF**. Cuando termina, únicamente ve la confirmación de que la entrevista fue enviada a Recursos Humanos.
 
-### Modo A · Privacidad total (predeterminado)
+## Qué recibe RH
 
-`config.js` viene así:
+Cada correo contiene:
 
-```js
-window.SARFRUT_CONFIG = {
-  SAVE_TO_GOOGLE_SHEETS: false,
-  GOOGLE_SHEETS_WEB_APP_URL: ''
-};
-```
+- asunto estandarizado `[SARFRUT][EXIT] Área | Puesto | Fecha`;
+- resumen estructurado en el cuerpo del correo;
+- calificación de los 7 aspectos;
+- promedio global y factores de atención;
+- PDF A4 adjunto con todas las respuestas, comentarios, resumen ejecutivo y análisis descriptivo;
+- logo SARFRUT integrado dentro del propio PDF, sin depender de cargar una imagen externa.
 
-En este modo no queda registro en el sitio. El único expediente es el PDF descargado.
+El formato del correo está pensado para que el buzón de RH pueda servir como archivo y posteriormente sea posible hacer resúmenes por área, motivo o periodo sin mantener una base de datos adicional.
 
-### Modo B · Histórico estadístico en Google Sheets
+## Privacidad / persistencia
 
-Si RH necesita estadísticas acumuladas, se puede activar una hoja de Google Sheets sin guardar datos identificables ni comentarios abiertos.
+Esta versión no usa Supabase ni Google Sheets. El sitio no mantiene una tabla de entrevistas. La información se procesa de forma transitoria para construir y enviar el correo. La copia persistente prevista es el correo recibido por Recursos Humanos y su PDF adjunto.
 
-Se conservan únicamente: fecha, puesto, área, tipo/motivos de salida, siete calificaciones, recomendaría/regresaría y promedio.
+## Configuración necesaria
 
 Consulta `google-apps-script/INSTRUCCIONES.md`.
 
-## Dashboard sin base de datos
+En Vercel solo necesitas dos variables de entorno:
 
-La ruta `/rh` permite cargar un CSV exportado de Google Sheets. El dashboard se calcula en el navegador e incluye:
+- `APPS_SCRIPT_WEB_APP_URL`
+- `MAIL_BRIDGE_SECRET`
 
-- filtros por área, tipo y fechas;
-- total de entrevistas;
-- porcentaje que recomendaría SARFRUT;
-- porcentaje que regresaría;
-- satisfacción promedio;
-- principales causas de salida;
-- promedio por aspecto;
-- impresión / Guardar como PDF del reporte filtrado.
+No se usan `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `ADMIN_PASSWORD` ni `SESSION_SECRET`.
 
-El CSV no se sube al servidor.
+## Archivos principales
 
-## Publicar en Vercel
+- `entrevista.html` — formulario.
+- `form.js` — validación, análisis, creación del PDF y envío.
+- `logo-data.js` — logo optimizado embebido para el PDF.
+- `api/send-interview.js` — función de Vercel que entrega el correo al Apps Script.
+- `google-apps-script/EmailGateway.gs` — envía el correo desde Google.
+- `google-apps-script/INSTRUCCIONES.md` — configuración paso a paso.
 
-Es un proyecto estático. Sube estos archivos a la carpeta que Vercel usa como **Root Directory** y haz commit a `main`.
+## Dashboard local
 
-No configures `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `ADMIN_PASSWORD` ni `SESSION_SECRET`: esta versión no los usa.
+Se conserva `/rh` como herramienta local para analizar un CSV si RH prepara uno en el futuro. No se alimenta automáticamente porque esta versión no mantiene una base de datos.
 
 ## Dependencias del navegador
 
-Para generar el PDF se cargan jsPDF y jsPDF-AutoTable desde jsDelivr. Por ello el dispositivo necesita conexión a internet al momento de abrir/generar el documento.
+jsPDF y jsPDF-AutoTable se cargan desde jsDelivr. El dispositivo necesita internet para abrir el formulario y generar el PDF.
 
-## Importante sobre el análisis
+## Análisis
 
-El análisis incluido en el PDF es una interpretación descriptiva basada en las calificaciones, motivos seleccionados y respuestas Sí/No. No es un diagnóstico, evaluación psicológica ni dictamen laboral.
-
-
-## v4.1 - corrección de PDF
-Se cambió el logo usado por jsPDF de PNG a JPEG para evitar el error `Incomplete or corrupt PNG file` en algunos navegadores. No cambia la lógica del formulario ni requiere base de datos.
+El análisis del PDF es descriptivo y se construye con reglas a partir de las respuestas de la entrevista. No es una evaluación psicológica ni un dictamen laboral.

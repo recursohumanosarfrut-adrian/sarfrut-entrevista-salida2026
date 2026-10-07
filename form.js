@@ -16,9 +16,6 @@ const progressBar = document.getElementById('progressBar');
 const message = document.getElementById('formMessage');
 const submitBtn = document.getElementById('submitBtn');
 const successModal = document.getElementById('successModal');
-const config = window.SARFRUT_CONFIG || {};
-let lastPayload = null;
-let lastAnalysis = null;
 
 function renderRatings(){
   const legend = document.createElement('div');
@@ -36,10 +33,6 @@ renderRatings();
 
 document.getElementById('fechaAplicacion').value = new Date().toISOString().slice(0,10);
 
-const privacyModeText = document.getElementById('privacyModeText');
-if(config.SAVE_TO_GOOGLE_SHEETS && config.GOOGLE_SHEETS_WEB_APP_URL){
-  privacyModeText.textContent = 'el PDF se genera en este dispositivo. Además, se enviará un registro estadístico a la hoja privada de Recursos Humanos; Vercel no almacena la entrevista.';
-}
 
 function syncConditional(){
   const tipo = form.querySelector('input[name="tipo_salida"]:checked')?.value;
@@ -139,12 +132,8 @@ function fmtDate(value){
 function yesNo(v){ return v ? 'Sí' : 'No'; }
 function safeFilename(s){ return String(s||'colaborador').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').replace(/^_+|_+$/g,'').slice(0,70); }
 
-async function logoDataUrl(){
-  try{
-    const res = await fetch('/assets/logo-sarfrut.jpg');
-    const blob = await res.blob();
-    return await new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(blob); });
-  }catch{ return null; }
+function logoDataUrl(){
+  return window.SARFRUT_LOGO_DATA_URL || null;
 }
 
 function splitOrDash(doc, text, width){
@@ -152,7 +141,7 @@ function splitOrDash(doc, text, width){
   return doc.splitTextToSize(clean || '—', width);
 }
 
-async function generatePdf(data, analysis){
+async function buildPdf(data, analysis){
   if(!window.jspdf?.jsPDF) throw new Error('No se pudo cargar el generador de PDF. Revisa la conexión a internet e inténtalo de nuevo.');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
@@ -160,8 +149,8 @@ async function generatePdf(data, analysis){
   const green = [8,120,63], dark = [11,76,49], orange = [244,154,26], muted = [94,109,100], line = [220,228,223];
   let y = 16;
 
-  const logo = await logoDataUrl();
-  if(logo) doc.addImage(logo,'JPEG',ml,y-2,24,24);
+  const logo = logoDataUrl();
+  if(logo) doc.addImage(logo,'JPEG',ml,y-2,22,24);
   doc.setTextColor(...dark); doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('SARFRUT S.A. DE C.V.',ml+30,y+3);
   doc.setFontSize(18); doc.text('ENTREVISTA DE SALIDA',ml+30,y+11);
   doc.setTextColor(...green); doc.setFontSize(8); doc.text('RECURSOS HUMANOS · RESUMEN Y ANÁLISIS',ml+30,y+17);
@@ -245,56 +234,52 @@ async function generatePdf(data, analysis){
   }
 
   const filename=`Entrevista_Salida_${safeFilename(data.nombre)}_${data.fecha_salida||new Date().toISOString().slice(0,10)}.pdf`;
-  doc.save(filename);
+  return {doc, filename};
 }
 
-async function saveStatisticalRecord(data, analysis){
-  if(!config.SAVE_TO_GOOGLE_SHEETS || !config.GOOGLE_SHEETS_WEB_APP_URL) return {enabled:false};
-  const payload = {
-    schema_version:'sarfrut_exit_v4',
-    generated_at:data.generated_at,
-    fecha_aplicacion:data.fecha_aplicacion,
-    fecha_salida:data.fecha_salida,
-    puesto:data.puesto,
-    departamento:data.departamento,
-    tipo_salida:data.tipo_salida,
-    motivos:data.motivos,
-    salario_prestaciones:data.salario_prestaciones,
-    funciones_carga:data.funciones_carga,
-    liderazgo:data.liderazgo,
-    ambiente_companeros:data.ambiente_companeros,
-    comunicacion_interna:data.comunicacion_interna,
-    capacitacion_desarrollo:data.capacitacion_desarrollo,
-    instalaciones_herramientas:data.instalaciones_herramientas,
-    recomendaria:data.recomendaria,
-    regresaria:data.regresaria,
-    promedio:Number(analysis.average.toFixed(2))
+
+function compactAnalysis(analysis){
+  return {
+    average:Number(analysis.average.toFixed(2)),
+    strengths:analysis.strengths.map(x=>({label:x.label,score:x.score})),
+    opportunities:analysis.opportunities.map(x=>({label:x.label,score:x.score})),
+    signals:analysis.signals,
+    general:analysis.general,
+    retention:analysis.retention,
+    recommendations:analysis.recommendations
   };
-  await fetch(config.GOOGLE_SHEETS_WEB_APP_URL,{
-    method:'POST',
-    mode:'no-cors',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(payload),
-    keepalive:true
-  });
-  return {enabled:true};
 }
 
-function renderAnalysisPreview(data,analysis){
-  const strengths = analysis.strengths.slice(0,2).map(x=>x.label).join(', ') || 'Sin fortalezas sobresalientes en la escala';
-  const attention = analysis.signals.slice(0,3).join(', ') || 'Sin alertas principales por escala/motivo';
-  document.getElementById('analysisPreview').innerHTML = `
-    <div><span>Promedio global</span><strong>${analysis.average.toFixed(1)} / 5</strong></div>
-    <div><span>Fortalezas</span><strong>${escapeHtml(strengths)}</strong></div>
-    <div><span>Atención</span><strong>${escapeHtml(attention)}</strong></div>`;
+async function sendInterviewToRh(data, analysis, pdfDoc, filename){
+  const dataUri = pdfDoc.output('datauristring');
+  const pdfBase64 = dataUri.split(',')[1];
+  if(!pdfBase64) throw new Error('No fue posible preparar el PDF para su envío.');
+
+  const res = await fetch('/api/send-interview', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      data,
+      analysis:compactAnalysis(analysis),
+      filename,
+      pdfBase64
+    })
+  });
+
+  let result = {};
+  try{ result = await res.json(); }catch{}
+  if(!res.ok || !result.ok){
+    throw new Error(result.error || 'No fue posible enviar la entrevista a Recursos Humanos.');
+  }
+  return result;
 }
-function escapeHtml(s){ return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   message.textContent = '';
   message.classList.remove('success');
   if(!form.reportValidity()) return;
+
   const motives = [...form.querySelectorAll('input[name="motivos"]:checked')];
   if(motives.length === 0){
     message.textContent = 'Selecciona al menos un motivo de salida.';
@@ -303,39 +288,32 @@ form.addEventListener('submit', async (e) => {
   }
 
   submitBtn.disabled = true;
-  submitBtn.querySelector('span:first-child').textContent = 'Generando…';
+  submitBtn.querySelector('span:first-child').textContent = 'Enviando…';
+
   try{
     const data = serializeForm();
     const analysis = buildAnalysis(data);
-    lastPayload = data; lastAnalysis = analysis;
-    await generatePdf(data,analysis);
-    let stat = {enabled:false};
-    try{ stat = await saveStatisticalRecord(data,analysis); }catch(err){ console.warn('No se pudo enviar el registro estadístico',err); }
-    renderAnalysisPreview(data,analysis);
-    document.getElementById('successText').textContent = stat.enabled
-      ? 'El PDF se descargó en este dispositivo. También se envió el registro estadístico configurado para RH.'
-      : 'El PDF se descargó en este dispositivo. Esta versión no guardó una copia en Vercel ni en una base de datos.';
-    message.textContent = 'Documento generado correctamente.';
+    const {doc, filename} = await buildPdf(data, analysis);
+    await sendInterviewToRh(data, analysis, doc, filename);
+
+    message.textContent = 'Entrevista enviada correctamente a Recursos Humanos.';
     message.classList.add('success');
     successModal.hidden = false;
   }catch(err){
     console.error(err);
-    message.textContent = err.message || 'No fue posible generar el documento. Intenta nuevamente.';
+    message.textContent = err.message || 'No fue posible enviar la entrevista. Tus respuestas siguen en pantalla; inténtalo nuevamente.';
   }finally{
     submitBtn.disabled = false;
-    submitBtn.querySelector('span:first-child').textContent = 'Generar PDF';
+    submitBtn.querySelector('span:first-child').textContent = 'Enviar entrevista';
   }
-});
-
-document.getElementById('downloadAgain').addEventListener('click', async()=>{
-  if(lastPayload && lastAnalysis) await generatePdf(lastPayload,lastAnalysis);
 });
 
 document.getElementById('closeSuccess').addEventListener('click', () => {
   successModal.hidden = true;
   form.reset();
-  lastPayload = null; lastAnalysis = null;
   document.getElementById('fechaAplicacion').value = new Date().toISOString().slice(0,10);
   document.querySelectorAll('[data-count-for]').forEach(x=>x.textContent='0');
-  syncConditional(); updateProgress(); window.scrollTo({top:0,behavior:'smooth'});
+  syncConditional();
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
 });
