@@ -70,3 +70,7 @@ Para generar el PDF se cargan jsPDF y jsPDF-AutoTable desde jsDelivr. Por ello e
 ## Importante sobre el análisis
 
 El análisis incluido en el PDF es una interpretación descriptiva basada en las calificaciones, motivos seleccionados y respuestas Sí/No. No es un diagnóstico, evaluación psicológica ni dictamen laboral.
+
+
+## v4.1 - corrección de PDF
+Se cambió el logo usado por jsPDF de PNG a JPEG para evitar el error `Incomplete or corrupt PNG file` en algunos navegadores. No cambia la lógica del formulario ni requiere base de datos.

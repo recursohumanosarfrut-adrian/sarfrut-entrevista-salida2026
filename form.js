@@ -141,7 +141,7 @@ function safeFilename(s){ return String(s||'colaborador').normalize('NFD').repla
 
 async function logoDataUrl(){
   try{
-    const res = await fetch('/assets/logo-sarfrut.png');
+    const res = await fetch('/assets/logo-sarfrut.jpg');
     const blob = await res.blob();
     return await new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(blob); });
   }catch{ return null; }
@@ -161,7 +161,7 @@ async function generatePdf(data, analysis){
   let y = 16;
 
   const logo = await logoDataUrl();
-  if(logo) doc.addImage(logo,'PNG',ml,y-2,24,24);
+  if(logo) doc.addImage(logo,'JPEG',ml,y-2,24,24);
   doc.setTextColor(...dark); doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('SARFRUT S.A. DE C.V.',ml+30,y+3);
   doc.setFontSize(18); doc.text('ENTREVISTA DE SALIDA',ml+30,y+11);
   doc.setTextColor(...green); doc.setFontSize(8); doc.text('RECURSOS HUMANOS · RESUMEN Y ANÁLISIS',ml+30,y+17);
