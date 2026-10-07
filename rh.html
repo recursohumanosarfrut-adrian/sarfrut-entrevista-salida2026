@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#08783f" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Analítica de salida | SARFRUT RH</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="dashboard-header">
+    <div class="shell header-inner">
+      <a class="brand compact-brand" href="/entrevista"><img src="/assets/logo-sarfrut.png" alt="SARFRUT" /></a>
+      <div class="header-copy"><span class="eyebrow">Recursos Humanos</span><h1>Analítica de entrevistas de salida</h1><p>Dashboard local a partir de un CSV de Google Sheets.</p></div>
+    </div>
+  </header>
+
+  <main class="shell dashboard-main">
+    <section id="importView" class="csv-import-card">
+      <span class="eyebrow">Sin base de datos</span>
+      <h2>Carga el histórico para analizarlo</h2>
+      <p>Exporta la hoja <b>Entrevistas</b> de Google Sheets como CSV y cárgala aquí. El archivo se procesa únicamente en este navegador; no se sube a Vercel.</p>
+      <label class="file-drop" for="csvFile">
+        <input id="csvFile" type="file" accept=".csv,text/csv" />
+        <strong>Seleccionar archivo CSV</strong>
+        <span>o arrástralo a esta zona</span>
+      </label>
+      <p id="csvMessage" class="form-message"></p>
+    </section>
+
+    <section id="dashboardView" hidden>
+      <div class="toolbar">
+        <div><span class="eyebrow">Resumen</span><h2>Indicadores de salida</h2><p id="lastUpdated">Archivo cargado localmente.</p></div>
+        <div class="toolbar-actions">
+          <button id="changeFileBtn" class="ghost-button" type="button">Cambiar CSV</button>
+          <button id="printDashboardBtn" class="primary-button" type="button">Imprimir / PDF reporte</button>
+        </div>
+      </div>
+
+      <section class="filters-card">
+        <label><span>Área</span><select id="filterArea"><option value="">Todas</option></select></label>
+        <label><span>Tipo de salida</span><select id="filterType"><option value="">Todos</option></select></label>
+        <label><span>Desde</span><input id="filterFrom" type="date" /></label>
+        <label><span>Hasta</span><input id="filterTo" type="date" /></label>
+        <button id="clearFilters" class="text-button" type="button">Limpiar filtros</button>
+      </section>
+      <div class="filter-summary-row"><span class="report-hint">El reporte impreso respeta los filtros activos.</span><span id="activeFilterSummary" class="filter-summary">Todas las áreas · Todos los tipos · Todas las fechas</span></div>
+
+      <section class="kpi-grid">
+        <article class="kpi-card"><span>Entrevistas</span><strong id="kpiTotal">0</strong><small>registros filtrados</small></article>
+        <article class="kpi-card"><span>Recomendarían SARFRUT</span><strong id="kpiRecommend">—</strong><small>respuestas afirmativas</small></article>
+        <article class="kpi-card"><span>Regresarían</span><strong id="kpiReturn">—</strong><small>respuestas afirmativas</small></article>
+        <article class="kpi-card"><span>Satisfacción promedio</span><strong id="kpiAverage">—</strong><small>escala de 1 a 5</small></article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel-card"><div class="panel-title"><div><span class="eyebrow">Motivos</span><h3>Principales causas de salida</h3></div></div><div id="reasonsChart" class="bar-chart"></div></article>
+        <article class="panel-card"><div class="panel-title"><div><span class="eyebrow">Experiencia</span><h3>Promedio por aspecto</h3></div></div><div id="ratingsChart" class="bar-chart"></div></article>
+      </section>
+
+      <section class="panel-card table-card">
+        <div class="panel-title"><div><span class="eyebrow">Detalle estadístico</span><h3>Registros incluidos</h3></div><span id="tableCount" class="count-badge">0</span></div>
+        <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Área</th><th>Puesto</th><th>Tipo</th><th>Motivos</th><th>Promedio</th></tr></thead><tbody id="responsesTable"></tbody></table></div>
+      </section>
+    </section>
+  </main>
+
+  <footer><div class="shell"><span>SARFRUT · Recursos Humanos</span><span>El CSV se procesa localmente y no se almacena en el sitio.</span></div></footer>
+  <script src="/rh-local.js" defer></script>
+</body>
+</html>

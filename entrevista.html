@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#08783f" />
+  <meta name="description" content="Entrevista de salida de SARFRUT S.A. de C.V." />
+  <title>Entrevista de salida | SARFRUT</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="form-page">
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/entrevista" aria-label="SARFRUT">
+        <img src="/assets/logo-sarfrut.png" alt="SARFRUT S.A. de C.V." />
+      </a>
+      <div class="header-copy">
+        <span class="eyebrow">Recursos Humanos</span>
+        <h1>Entrevista de salida</h1>
+        <p>Tu experiencia nos ayuda a identificar oportunidades de mejora.</p>
+      </div>
+      <span class="confidential-badge">Confidencial</span>
+    </div>
+  </header>
+
+  <main class="shell main-shell">
+    <section class="intro-card">
+      <div>
+        <span class="pill">SARFRUT S.A. DE C.V.</span>
+        <h2>Gracias por compartir tu experiencia</h2>
+        <p>Al finalizar se generará un PDF con tus respuestas, un resumen ejecutivo y un análisis descriptivo para Recursos Humanos.</p>
+      </div>
+      <div class="progress-panel" aria-label="Progreso del formulario">
+        <div class="progress-top"><span>Avance</span><strong id="progressText">0%</strong></div>
+        <div class="progress-track"><span id="progressBar"></span></div>
+      </div>
+    </section>
+
+    <div class="privacy-notice">
+      <strong>Privacidad por diseño:</strong>
+      <span id="privacyModeText">esta versión genera el PDF en el navegador y no guarda una copia en Vercel ni en una base de datos.</span>
+    </div>
+
+    <form id="exitForm" novalidate>
+      <section class="form-section" data-section="1">
+        <div class="section-heading"><span class="section-number">1</span><div><p>Datos generales</p><h2>Cuéntanos sobre tu posición</h2></div></div>
+        <div class="form-grid two-cols">
+          <label class="field span-2"><span>Nombre completo <em>*</em></span><input name="nombre" autocomplete="name" required maxlength="120" /></label>
+          <label class="field"><span>Puesto <em>*</em></span><input name="puesto" required maxlength="120" /></label>
+          <label class="field"><span>Departamento / Área <em>*</em></span><input name="departamento" required maxlength="120" /></label>
+          <label class="field span-2"><span>Jefe(a) inmediato(a)</span><input name="jefe" maxlength="120" /></label>
+          <label class="field"><span>Fecha de ingreso</span><input type="date" name="fecha_ingreso" /></label>
+          <label class="field"><span>Fecha de salida <em>*</em></span><input type="date" name="fecha_salida" required /></label>
+        </div>
+
+        <fieldset class="choice-group">
+          <legend>Tipo de salida <em>*</em></legend>
+          <div class="choice-grid four-cols">
+            <label class="choice-card"><input type="radio" name="tipo_salida" value="Renuncia voluntaria" required /><span><b>Renuncia voluntaria</b></span></label>
+            <label class="choice-card"><input type="radio" name="tipo_salida" value="Término de contrato" /><span><b>Término de contrato</b></span></label>
+            <label class="choice-card"><input type="radio" name="tipo_salida" value="Terminación laboral" /><span><b>Terminación laboral</b></span></label>
+            <label class="choice-card"><input type="radio" name="tipo_salida" value="Otro" /><span><b>Otro</b></span></label>
+          </div>
+          <label class="field conditional" id="tipoOtroWrap" hidden><span>Especifica otro tipo de salida</span><input name="tipo_salida_otro" maxlength="120" /></label>
+        </fieldset>
+      </section>
+
+      <section class="form-section" data-section="2">
+        <div class="section-heading"><span class="section-number">2</span><div><p>Motivo de salida</p><h2>¿Qué influyó en tu decisión?</h2></div></div>
+        <p class="field-help">Puedes seleccionar más de una opción.</p>
+        <fieldset class="choice-group" aria-label="Motivos de salida">
+          <div class="choice-grid three-cols checkbox-grid">
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Mejor oportunidad o salario" /><span>Mejor oportunidad o salario</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Crecimiento profesional" /><span>Crecimiento profesional</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Motivos personales o familiares" /><span>Motivos personales o familiares</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Horario o traslado" /><span>Horario o traslado</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Ambiente laboral" /><span>Ambiente laboral</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Relación con jefatura o equipo" /><span>Relación con jefatura o equipo</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Estudios" /><span>Estudios</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Salud" /><span>Salud</span></label>
+            <label class="choice-card"><input type="checkbox" name="motivos" value="Otro" /><span>Otro</span></label>
+          </div>
+          <label class="field conditional" id="motivoOtroWrap" hidden><span>Especifica otro motivo</span><input name="motivo_otro" maxlength="160" /></label>
+        </fieldset>
+        <label class="field"><span>Explica brevemente el motivo principal <em>*</em></span><textarea name="motivo_principal" required maxlength="1500" rows="5" placeholder="Describe brevemente qué fue lo que más influyó en tu salida."></textarea><small><span data-count-for="motivo_principal">0</span>/1500</small></label>
+      </section>
+
+      <section class="form-section" data-section="3">
+        <div class="section-heading"><span class="section-number">3</span><div><p>Experiencia laboral</p><h2>¿Cómo evaluarías tu experiencia?</h2></div></div>
+        <p class="field-help">Selecciona una opción por cada aspecto. 5 = Muy satisfecho y 1 = Muy insatisfecho.</p>
+        <div id="ratings" class="ratings"></div>
+      </section>
+
+      <section class="form-section" data-section="4">
+        <div class="section-heading"><span class="section-number">4</span><div><p>Comentarios finales</p><h2>Tu opinión cuenta</h2></div></div>
+        <div class="form-grid two-cols">
+          <label class="field"><span>¿Qué fue lo que más te gustó de trabajar en SARFRUT?</span><textarea name="gusto" maxlength="1500" rows="5"></textarea></label>
+          <label class="field"><span>¿Qué consideras que debemos mejorar?</span><textarea name="mejorar" maxlength="1500" rows="5"></textarea></label>
+          <label class="field span-2"><span>¿Qué habría hecho que decidieras permanecer en la empresa?</span><textarea name="permanecer" maxlength="1500" rows="4"></textarea></label>
+        </div>
+
+        <div class="yesno-grid">
+          <fieldset class="choice-group compact"><legend>¿Recomendarías SARFRUT como un buen lugar para trabajar? <em>*</em></legend><div class="choice-grid two-cols"><label class="choice-card"><input type="radio" name="recomendaria" value="true" required /><span>Sí</span></label><label class="choice-card"><input type="radio" name="recomendaria" value="false" /><span>No</span></label></div></fieldset>
+          <fieldset class="choice-group compact"><legend>¿Considerarías regresar a trabajar en SARFRUT en el futuro? <em>*</em></legend><div class="choice-grid two-cols"><label class="choice-card"><input type="radio" name="regresaria" value="true" required /><span>Sí</span></label><label class="choice-card"><input type="radio" name="regresaria" value="false" /><span>No</span></label></div></fieldset>
+        </div>
+
+        <label class="field"><span>Sugerencias o comentarios adicionales</span><textarea name="comentarios" maxlength="2000" rows="5"></textarea></label>
+      </section>
+
+      <section class="form-section final-section">
+        <div class="section-heading minimal"><span class="section-number checkmark">✓</span><div><p>Cierre</p><h2>Confirmación de la entrevista</h2></div></div>
+        <div class="form-grid two-cols">
+          <label class="field"><span>Nombre de quien entrevista <em>*</em></span><input name="entrevistador" required maxlength="120" /></label>
+          <label class="field"><span>Fecha de aplicación</span><input id="fechaAplicacion" type="date" name="fecha_aplicacion" readonly /></label>
+        </div>
+        <label class="consent"><input type="checkbox" name="confirmacion" required /><span>Confirmo que la información registrada corresponde a mi entrevista de salida y puede ser utilizada por Recursos Humanos para fines internos de análisis y mejora.</span></label>
+        <div class="submit-row">
+          <div><strong>Antes de generar el documento</strong><p>Revisa que tus respuestas estén completas. Al finalizar se descargará un PDF automáticamente.</p></div>
+          <button class="primary-button" type="submit" id="submitBtn"><span>Generar PDF</span><span aria-hidden="true">→</span></button>
+        </div>
+        <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+      </section>
+    </form>
+  </main>
+
+  <footer><div class="shell"><span>Recursos Humanos · Documento de uso interno</span><span>La información será tratada de forma confidencial.</span></div></footer>
+
+  <div id="successModal" class="modal" hidden>
+    <div class="modal-card modal-card-wide" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+      <div class="success-icon">✓</div>
+      <h2 id="successTitle">PDF generado correctamente</h2>
+      <p id="successText">El documento se descargó en este dispositivo.</p>
+      <div id="analysisPreview" class="analysis-preview"></div>
+      <div class="modal-actions">
+        <button class="ghost-button" type="button" id="downloadAgain">Descargar PDF otra vez</button>
+        <button class="primary-button" type="button" id="closeSuccess">Nueva entrevista</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="/config.js"></script>
+  <script src="/form.js" defer></script>
+</body>
+</html>

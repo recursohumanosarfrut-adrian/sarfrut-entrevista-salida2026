@@ -1,0 +1,6 @@
+{
+  "name": "sarfrut-entrevista-salida-v4",
+  "private": true,
+  "version": "4.0.0",
+  "description": "Entrevista de salida SARFRUT sin base de datos: PDF local y registro estadístico opcional en Google Sheets"
+}
